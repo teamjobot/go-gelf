@@ -85,10 +85,10 @@ func newGraylogBackend(address string) logging.LeveledBackend {
 	}
 
 	backend := logging.NewLogBackend(logger, "", 0)
-	return logging.AddModuleLevel(logging.NewBackendFormatter(backend, seqFormat()))
+	return logging.AddModuleLevel(logging.NewBackendFormatter(backend, gelfFormat()))
 }
 
-func seqFormat() logging.Formatter {
+func gelfFormat() logging.Formatter {
 	return logging.MustStringFormatter(gelf.LogFormat)
 }
 

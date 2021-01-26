@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"path"
 	"strings"
 	"time"
 )
@@ -171,8 +172,9 @@ func constructMessage(w LogWrite) (m *Message) {
 		// Facility is deprecated
 		//Facility: w.Facility,
 		Extra: map[string]interface{}{
-			"_app": w.Facility,
-			"_file":     w.File,
+			"_app":      w.Facility,
+			"_filename": w.File,
+			"_file":     path.Base(w.File),
 			"_line":     w.Line,
 			"_function": parts[1],
 		},

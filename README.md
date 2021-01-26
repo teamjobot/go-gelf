@@ -56,8 +56,8 @@ giving us both centralized and local logs.  (Redundancy is nice).
 package main
 
 import (
-	"github.com/teamjobot/go-gelf"
 	"github.com/op/go-logging"
+	"github.com/teamjobot/go-gelf"
 )
 
 func main() {

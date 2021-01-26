@@ -64,10 +64,11 @@ func numChunks(b []byte) int {
 // New returns a new GELF Writer.  This writer can be used to send the
 // output of the standard Go log functions to a central GELF server by
 // passing it to log.SetOutput()
-func NewUDPWriter(addr string) (*UDPWriter, error) {
+func NewUDPWriter(addr, environment string) (*UDPWriter, error) {
 	var err error
 	w := new(UDPWriter)
 	w.CompressionLevel = flate.BestSpeed
+	w.environment = environment
 
 	if w.conn, err = net.Dial("udp", addr); err != nil {
 		return nil, err
@@ -78,7 +79,7 @@ func NewUDPWriter(addr string) (*UDPWriter, error) {
 
 	w.Facility = path.Base(os.Args[0])
 
-	if strings.HasPrefix(w.Facility, "___") && strings.HasPrefix(os.Args[0],"/private/var") {
+	if strings.HasPrefix(w.Facility, "___") && strings.HasPrefix(os.Args[0], "/private/var") {
 		w.Facility = w.Facility[3:]
 	}
 
@@ -227,11 +228,12 @@ func (w *UDPWriter) Write(p []byte) (n int, err error) {
 	file, line := getCallerIgnoringLogMulti(1)
 
 	payload := LogWrite{
-		Payload:  p,
-		HostName: w.hostname,
-		Facility: w.Facility,
-		File:     file,
-		Line:     line,
+		Payload:     p,
+		HostName:    w.hostname,
+		Facility:    w.Facility,
+		File:        file,
+		Line:        line,
+		Environment: w.environment,
 	}
 
 	m := constructMessage(payload)

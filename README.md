@@ -58,6 +58,7 @@ package main
 import (
 	"github.com/op/go-logging"
 	"github.com/teamjobot/go-gelf"
+	"os"
 )
 
 func main() {
@@ -78,7 +79,7 @@ func main() {
 
 func newGraylogBackend(address string) logging.LeveledBackend {
 	// or NewTCPWriter(address)
-	var logger, err = NewUDPWriter(address)
+	var logger, err = NewUDPWriter(address, os.Getenv("jax_environment"))
 
 	if err != nil {
 		log.Fatalf("Failed to create UDP writer: %s", err)

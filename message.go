@@ -136,11 +136,12 @@ func (m *Message) toBytes(buf *bytes.Buffer) (messageBytes []byte, err error) {
 }
 
 type LogWrite struct {
-	Payload  []byte
-	HostName string
-	Facility string
-	File     string
-	Line     int
+	Payload     []byte
+	HostName    string
+	Facility    string
+	File        string
+	Line        int
+	Environment string
 }
 
 func constructMessage(w LogWrite) (m *Message) {
@@ -174,6 +175,7 @@ func constructMessage(w LogWrite) (m *Message) {
 		//Facility: w.Facility,
 		Extra: map[string]interface{}{
 			"_app":      w.Facility,
+			"_env":      w.Environment,
 			"_filename": w.File,
 			"_file":     path.Base(w.File),
 			"_line":     w.Line,

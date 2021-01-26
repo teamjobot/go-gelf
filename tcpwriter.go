@@ -20,9 +20,10 @@ type TCPWriter struct {
 	ReconnectDelay time.Duration
 }
 
-func NewTCPWriter(addr string) (*TCPWriter, error) {
+func NewTCPWriter(addr, environment string) (*TCPWriter, error) {
 	var err error
 	w := new(TCPWriter)
+	w.environment = environment
 	w.MaxReconnect = DefaultMaxReconnect
 	w.ReconnectDelay = DefaultReconnectDelay
 	w.proto = "tcp"
@@ -67,11 +68,12 @@ func (w *TCPWriter) Write(p []byte) (n int, err error) {
 	file, line := getCallerIgnoringLogMulti(1)
 
 	payload := LogWrite{
-		Payload:  p,
-		HostName: w.hostname,
-		Facility: w.Facility,
-		File:     file,
-		Line:     line,
+		Payload:     p,
+		HostName:    w.hostname,
+		Facility:    w.Facility,
+		File:        file,
+		Line:        line,
+		Environment: w.environment,
 	}
 
 	m := constructMessage(payload)

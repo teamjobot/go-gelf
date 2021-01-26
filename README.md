@@ -41,7 +41,7 @@ Graylog server.
 
 Installing
 ----------
-
+	cd $GOPATH
     go get github.com/teamjobot/go-gelf
 
 Usage

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"os"
 	"path"
 	"strings"
 	"time"
@@ -177,6 +178,7 @@ func constructMessage(w LogWrite) (m *Message) {
 			"_file":     path.Base(w.File),
 			"_line":     w.Line,
 			"_function": parts[1],
+			"_pid":      os.Getpid(),
 		},
 	}
 

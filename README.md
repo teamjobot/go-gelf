@@ -7,7 +7,7 @@ can be run over any stream or datagram transport protocol, it has
 special support ([chunking]) to allow long messages to be split over
 multiple datagrams.
 
-History
+History and Overview
 ------
 This repo was duplicated from https://github.com/Graylog2/go-gelf/tree/v2 (not forked for originally private repo).
 
@@ -16,12 +16,20 @@ It has specific customizations for Jobot company needs but is not company confid
 Primary customizations:
 
 - A [standardized logging format](gelf.go) so data can be extracted from logged message and input better into Seq
+  - [Additional fields are added](https://github.com/teamjobot/go-gelf/blob/main/message.go#L176) that can be filtered and searched separately from log msg
 - Support for log levels - source package logged everything as Info
 - Support for Go function name
 - Support for log message id
 - Support for https://github.com/op/go-logging (source is go log pkg only)
   - Excluding it from call stack for log location
   - Handling file and line number appropriately
+
+This library helps strike a good middle ground between the two extremes of:
+1. Having to replace a log library and use it everywhere OR
+2. Just sending stdout to a GELF endpoint and not be able to add fields or customize message format
+
+By only requiring creating a GELF writer and adding as a backend, apps can quickly send logs that have common
+helpful fields and formatted in a way that makes them easier to view.
 
 Versions
 --------
@@ -49,11 +57,6 @@ Installing
 
 Usage
 -----
-
-The easiest way to integrate graylog logging into your go app is by
-having your `main` function (or even `init`) call `log.SetOutput()`.
-By using an `io.MultiWriter`, we can log to both stdout and graylog -
-giving us both centralized and local logs.  (Redundancy is nice).
 
 ```golang
 package main

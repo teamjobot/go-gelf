@@ -9,16 +9,19 @@ multiple datagrams.
 
 History
 ------
-This repo was duplicated from https://github.com/Graylog2/go-gelf/tree/v2.
+This repo was duplicated from https://github.com/Graylog2/go-gelf/tree/v2 (not forked for originally private repo).
 
-It has specific changes to work better in the Jobot environment:
+It has specific customizations for Jobot company needs but is not company confidential and currently public as such and for easier installs.
 
-- A standardized logging format so data can be extracted from logged message and input better into Seq
+Primary customizations:
+
+- A [standardized logging format](gelf.go) so data can be extracted from logged message and input better into Seq
 - Support for log levels - source package logged everything as Info
 - Support for Go function name
 - Support for log message id
-- Support for https://github.com/op/go-logging used by several Jobot apps
-- Support for file and line number - source only worked with standard go log pkg
+- Support for https://github.com/op/go-logging (source is go log pkg only)
+  - Excluding it from call stack for log location
+  - Handling file and line number appropriately
 
 Versions
 --------

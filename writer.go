@@ -23,7 +23,8 @@ type GelfWriter struct {
 	hostname    string
 	Facility    string // defaults to current process name
 	proto       string
-	environment string
+	environment *string
+	appName     *string
 }
 
 // Close connection and interrupt blocked Read or Write operations

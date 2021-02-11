@@ -20,16 +20,21 @@ type TCPWriter struct {
 	ReconnectDelay time.Duration
 }
 
-func NewTCPWriter(addr, environment string) (*TCPWriter, error) {
+func NewTCPWriter(settings Settings) (*TCPWriter, error) {
 	var err error
 	w := new(TCPWriter)
-	w.environment = environment
+	if settings.Env != nil {
+		w.environment = settings.Env
+	}
+	if settings.AppName != nil {
+		w.appName = settings.AppName
+	}
 	w.MaxReconnect = DefaultMaxReconnect
 	w.ReconnectDelay = DefaultReconnectDelay
 	w.proto = "tcp"
-	w.addr = addr
+	w.addr = settings.Address
 
-	if w.conn, err = net.Dial("tcp", addr); err != nil {
+	if w.conn, err = net.Dial("tcp", settings.Address); err != nil {
 		return nil, err
 	}
 	if w.hostname, err = os.Hostname(); err != nil {
@@ -74,6 +79,7 @@ func (w *TCPWriter) Write(p []byte) (n int, err error) {
 		File:        file,
 		Line:        line,
 		Environment: w.environment,
+		AppName:     w.appName,
 	}
 
 	m := constructMessage(payload)

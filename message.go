@@ -141,7 +141,8 @@ type LogWrite struct {
 	Facility    string
 	File        string
 	Line        int
-	Environment string
+	Environment *string
+	AppName     *string
 }
 
 func constructMessage(w LogWrite) (m *Message) {
@@ -162,6 +163,19 @@ func constructMessage(w LogWrite) (m *Message) {
 		full = msgBytes
 	}
 
+	appName := w.AppName
+	env := w.Environment
+
+	// Allows caller to override app name otherwise default to executable name
+	if appName == nil {
+		appName = &w.Facility
+	}
+
+	if env == nil {
+		s := ""
+		env = &s
+	}
+
 	// https://docs.graylog.org/en/4.0/pages/gelf.html
 	m = &Message{
 		Version:  "1.1",
@@ -174,8 +188,8 @@ func constructMessage(w LogWrite) (m *Message) {
 		// Facility is deprecated
 		//Facility: w.Facility,
 		Extra: map[string]interface{}{
-			"_app":      w.Facility,
-			"_env":      w.Environment,
+			"_app":      appName,
+			"_env":      env,
 			"_filename": w.File,
 			"_file":     path.Base(w.File),
 			"_line":     w.Line,

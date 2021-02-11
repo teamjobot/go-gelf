@@ -176,6 +176,8 @@ func constructMessage(w LogWrite) (m *Message) {
 		env = &s
 	}
 
+	file := strings.ReplaceAll(path.Base(w.File), ".go", "")
+
 	// https://docs.graylog.org/en/4.0/pages/gelf.html
 	m = &Message{
 		Version:  "1.1",
@@ -191,7 +193,7 @@ func constructMessage(w LogWrite) (m *Message) {
 			"_app":      appName,
 			"_env":      env,
 			"_filename": w.File,
-			"_file":     path.Base(w.File),
+			"_file":     file,
 			"_line":     w.Line,
 			"_function": parts[1],
 			"_pid":      os.Getpid(),

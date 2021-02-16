@@ -25,6 +25,7 @@ type GelfWriter struct {
 	proto       string
 	environment *string
 	appName     *string
+	version     *string
 }
 
 // Close connection and interrupt blocked Read or Write operations

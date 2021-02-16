@@ -85,7 +85,12 @@ func main() {
 
 func newGraylogBackend(address string) logging.LeveledBackend {
 	// or NewTCPWriter(address)
-	var logger, err = NewUDPWriter(address, os.Getenv("jax_environment"))
+	settings := gelf.Settings {
+        Address: address,
+		AppName: stringp("my-app"), 
+		Env: stringp("uat"), 
+		Version: &Version}
+	var logger, err = gelf.NewUDPWriter(settings)
 
 	if err != nil {
 		log.Fatalf("Failed to create UDP writer: %s", err)

@@ -69,13 +69,9 @@ func NewUDPWriter(settings Settings) (*UDPWriter, error) {
 	w := new(UDPWriter)
 	w.CompressionLevel = flate.BestSpeed
 
-	if settings.Env != nil {
-		w.environment = settings.Env
-	}
-
-	if settings.AppName != nil {
-		w.appName = settings.AppName
-	}
+	w.environment = settings.Env
+	w.appName = settings.AppName
+	w.version = settings.Version
 
 	if w.conn, err = net.Dial("udp", settings.Address); err != nil {
 		return nil, err
@@ -235,13 +231,14 @@ func (w *UDPWriter) Write(p []byte) (n int, err error) {
 	file, line := getCallerIgnoringLogMulti(1)
 
 	payload := LogWrite{
-		Payload:     p,
-		HostName:    w.hostname,
+		AppName:     w.appName,
+		Environment: w.environment,
 		Facility:    w.Facility,
 		File:        file,
+		HostName:    w.hostname,
 		Line:        line,
-		Environment: w.environment,
-		AppName:     w.appName,
+		Payload:     p,
+		Version:     w.version,
 	}
 
 	m := constructMessage(payload)

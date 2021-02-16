@@ -8,6 +8,7 @@ const (
 // Settings contains Gelf writer settings
 type Settings struct {
 	Address string
-	Env     *string
 	AppName *string
+	Env     *string
+	Version *string
 }

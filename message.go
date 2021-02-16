@@ -136,17 +136,17 @@ func (m *Message) toBytes(buf *bytes.Buffer) (messageBytes []byte, err error) {
 }
 
 type LogWrite struct {
-	Payload     []byte
-	HostName    string
+	AppName     *string
+	Environment *string
 	Facility    string
 	File        string
+	HostName    string
 	Line        int
-	Environment *string
-	AppName     *string
+	Payload     []byte
+	Version     *string
 }
 
 func constructMessage(w LogWrite) (m *Message) {
-	// TODO: expose this pattern for callers to use in Seq backend format
 	// %{id:03x}|%{shortfunc}|%{level:.4s}|%{message}
 	parts := strings.Split(string(w.Payload), "|")
 
@@ -176,6 +176,13 @@ func constructMessage(w LogWrite) (m *Message) {
 		env = &s
 	}
 
+	version := w.Version
+
+	if version == nil {
+		s := ""
+		version = &s
+	}
+
 	file := strings.ReplaceAll(path.Base(w.File), ".go", "")
 
 	// https://docs.graylog.org/en/4.0/pages/gelf.html
@@ -197,6 +204,7 @@ func constructMessage(w LogWrite) (m *Message) {
 			"_line":     w.Line,
 			"_function": parts[1],
 			"_pid":      os.Getpid(),
+			"_version":  version,
 		},
 	}
 

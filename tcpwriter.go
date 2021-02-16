@@ -23,12 +23,9 @@ type TCPWriter struct {
 func NewTCPWriter(settings Settings) (*TCPWriter, error) {
 	var err error
 	w := new(TCPWriter)
-	if settings.Env != nil {
-		w.environment = settings.Env
-	}
-	if settings.AppName != nil {
-		w.appName = settings.AppName
-	}
+	w.environment = settings.Env
+	w.appName = settings.AppName
+	w.version = settings.Version
 	w.MaxReconnect = DefaultMaxReconnect
 	w.ReconnectDelay = DefaultReconnectDelay
 	w.proto = "tcp"
@@ -73,13 +70,14 @@ func (w *TCPWriter) Write(p []byte) (n int, err error) {
 	file, line := getCallerIgnoringLogMulti(1)
 
 	payload := LogWrite{
-		Payload:     p,
-		HostName:    w.hostname,
+		AppName:     w.appName,
+		Environment: w.environment,
 		Facility:    w.Facility,
 		File:        file,
+		HostName:    w.hostname,
 		Line:        line,
-		Environment: w.environment,
-		AppName:     w.appName,
+		Payload:     p,
+		Version:     w.version,
 	}
 
 	m := constructMessage(payload)

@@ -146,21 +146,61 @@ type LogWrite struct {
 	Version     *string
 }
 
-func constructMessage(w LogWrite) (m *Message) {
-	// %{id:03x}|%{shortfunc}|%{level:.4s}|%{message}
+// %{id:03x}|%{module}|%{shortpkg}|%{shortfunc}|%{level:.4s}|%{message}
+const (
+	partId = 0
+	partModule = 1
+	partPkg = 2
+	partFunc = 3
+	partLevel = 4
+	partMsg = 5
+)
+
+type Parts struct {
+	Id string
+	Module string
+	Pkg string
+	Func string
+	Level string
+	Msg []byte
+}
+
+func getMessageParts(w LogWrite) Parts {
+	result := Parts{}
 	parts := strings.Split(string(w.Payload), "|")
 
-	msgBytes := bytes.TrimSpace([]byte(parts[3]))
+	// This is a safety check for transitioning between format changes in event caller backend format isn't in sync
+	// with the latest extended format here.
+	if len(parts) == 6 {
+		result.Id = parts[partId]
+		result.Module = parts[partModule]
+		result.Pkg = parts[partPkg]
+		result.Func = parts[partFunc]
+		result.Level = parts[partLevel]
+		result.Msg = bytes.TrimSpace([]byte(parts[partMsg]))
+	} else if len(parts) == 4 {
+		result.Id = parts[0]
+		result.Func = parts[1]
+		result.Level = parts[2]
+		result.Msg = bytes.TrimSpace([]byte(parts[3]))
+	}
+
+	return result
+}
+
+func constructMessage(w LogWrite) (m *Message) {
+	// See gelf.LogFormat and constants above
+	parts := getMessageParts(w)
 
 	// If there are newlines in the message, use the first line
 	// for the short message and set the full message to the original input.
 	// If the input has no newlines, stick the whole thing in Short.
-	short := msgBytes
+	short := parts.Msg
 	full := []byte("")
 
-	if i := bytes.IndexRune(msgBytes, '\n'); i > 0 {
-		short = msgBytes[:i]
-		full = msgBytes
+	if i := bytes.IndexRune(parts.Msg, '\n'); i > 0 {
+		short = parts.Msg[:i]
+		full = parts.Msg
 	}
 
 	appName := w.AppName
@@ -192,7 +232,7 @@ func constructMessage(w LogWrite) (m *Message) {
 		Short:    string(short),
 		Full:     string(full),
 		TimeUnix: float64(time.Now().UnixNano()) / float64(time.Second),
-		Level:    levelMap[parts[2]],
+		Level:    levelMap[parts.Level],
 
 		// Facility is deprecated
 		//Facility: w.Facility,
@@ -201,9 +241,12 @@ func constructMessage(w LogWrite) (m *Message) {
 			"_env":      env,
 			"_filename": w.File,
 			"_file":     file,
+			"_function": parts.Func,
+			"_id":       parts.Id,
 			"_line":     w.Line,
-			"_function": parts[1],
+			"_module":   parts.Module,
 			"_pid":      os.Getpid(),
+			"_pkg":		 parts.Pkg,
 			"_version":  version,
 		},
 	}

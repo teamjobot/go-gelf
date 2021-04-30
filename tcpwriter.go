@@ -30,6 +30,7 @@ func NewTCPWriter(settings Settings) (*TCPWriter, error) {
 	w.ReconnectDelay = DefaultReconnectDelay
 	w.proto = "tcp"
 	w.addr = settings.Address
+	w.Meta = settings.Meta
 
 	if w.conn, err = net.Dial("tcp", settings.Address); err != nil {
 		return nil, err
@@ -78,6 +79,7 @@ func (w *TCPWriter) Write(p []byte) (n int, err error) {
 		Line:        line,
 		Payload:     p,
 		Version:     w.version,
+		Meta:        w.Meta,
 	}
 
 	m := constructMessage(payload)

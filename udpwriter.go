@@ -72,6 +72,7 @@ func NewUDPWriter(settings Settings) (*UDPWriter, error) {
 	w.environment = settings.Env
 	w.appName = settings.AppName
 	w.version = settings.Version
+	w.Meta = settings.Meta
 
 	if w.conn, err = net.Dial("udp", settings.Address); err != nil {
 		return nil, err
@@ -239,6 +240,7 @@ func (w *UDPWriter) Write(p []byte) (n int, err error) {
 		Line:        line,
 		Payload:     p,
 		Version:     w.version,
+		Meta:        w.Meta,
 	}
 
 	m := constructMessage(payload)

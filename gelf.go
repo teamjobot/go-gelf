@@ -13,5 +13,9 @@ type Settings struct {
 	Address string
 	AppName *string
 	Env     *string
+
+	// Additional fields to add to each log statement
+	Meta map[string]string
+
 	Version *string
 }

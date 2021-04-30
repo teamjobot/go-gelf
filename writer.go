@@ -26,6 +26,9 @@ type GelfWriter struct {
 	environment *string
 	appName     *string
 	version     *string
+
+	// Additional fields to add to each log statement
+	Meta map[string]string
 }
 
 // Close connection and interrupt blocked Read or Write operations

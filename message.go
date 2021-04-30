@@ -144,25 +144,27 @@ type LogWrite struct {
 	Line        int
 	Payload     []byte
 	Version     *string
+	// Additional fields to add to each log statement
+	Meta map[string]string
 }
 
 // %{id:03x}|%{module}|%{shortpkg}|%{shortfunc}|%{level:.4s}|%{message}
 const (
-	partId = 0
+	partId     = 0
 	partModule = 1
-	partPkg = 2
-	partFunc = 3
-	partLevel = 4
-	partMsg = 5
+	partPkg    = 2
+	partFunc   = 3
+	partLevel  = 4
+	partMsg    = 5
 )
 
 type Parts struct {
-	Id string
+	Id     string
 	Module string
-	Pkg string
-	Func string
-	Level string
-	Msg []byte
+	Pkg    string
+	Func   string
+	Level  string
+	Msg    []byte
 }
 
 func getMessageParts(w LogWrite) Parts {
@@ -246,9 +248,13 @@ func constructMessage(w LogWrite) (m *Message) {
 			"_line":     w.Line,
 			"_module":   parts.Module,
 			"_pid":      os.Getpid(),
-			"_pkg":		 parts.Pkg,
+			"_pkg":      parts.Pkg,
 			"_version":  version,
 		},
+	}
+
+	for k, v := range w.Meta {
+		m.Extra[k] = v
 	}
 
 	return m

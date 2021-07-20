@@ -173,14 +173,30 @@ func getMessageParts(w LogWrite) Parts {
 
 	// This is a safety check for transitioning between format changes in event caller backend format isn't in sync
 	// with the latest extended format here.
-	if len(parts) == 6 {
+
+	// `%{id:03x}|%{module}|%{shortpkg}|%{shortfunc}|%{level:.4s}|%{message}`
+	// >= as message might have the "|" separator within it, creating more parts
+	if len(parts) >= 6 {
 		result.Id = parts[partId]
 		result.Module = parts[partModule]
 		result.Pkg = parts[partPkg]
 		result.Func = parts[partFunc]
 		result.Level = parts[partLevel]
-		result.Msg = bytes.TrimSpace([]byte(parts[partMsg]))
-	} else if len(parts) == 4 {
+
+		if len(parts) == 6 {
+			result.Msg = bytes.TrimSpace([]byte(parts[partMsg]))
+		} else if len(parts) > 6 {
+			var buf bytes.Buffer
+			for i := partMsg; i < len(parts); i++ {
+				buf.WriteString(parts[i])
+
+				if i+1 < len(parts) {
+					buf.WriteString("|")
+				}
+			}
+			result.Msg = bytes.TrimSpace([]byte(buf.String()))
+		}
+	} else {
 		result.Id = parts[0]
 		result.Func = parts[1]
 		result.Level = parts[2]

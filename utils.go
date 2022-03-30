@@ -37,6 +37,8 @@ outer:
 
 func getCallerIgnoringLogMulti(callDepth int) (string, int) {
 	// the +1 is to ignore this (getCallerIgnoringLogMulti) frame
+	// Can't easily do just suffix w/o regex now since we use modules now with varying version number:
+	// /home/ubuntu/gocode/pkg/mod/github.com/op/go-logging@v0.0.0-20160315200505-970db520ece7/log_nix.go
 	return getCaller(
 		callDepth+1,
 		"/pkg/log/log.go",
@@ -46,5 +48,6 @@ func getCallerIgnoringLogMulti(callDepth int) (string, int) {
 		"go-logging/log_nix.go",
 		"go-logging/format.go",
 		"go-logging/level.go",
-		"go-logging/logger.go")
+		"go-logging/logger.go",
+		"log_nix.go")
 }

@@ -24,6 +24,11 @@ outer:
 			break
 		}
 
+		if strings.Contains(file, "github.com/op/go-logging") {
+			callDepth++
+			continue outer
+		}
+
 		for _, s := range suffixesToIgnore {
 			if strings.HasSuffix(file, s) {
 				callDepth++
